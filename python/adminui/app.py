@@ -196,12 +196,12 @@ class AdminApp:
             args = self.get_url_args(request)
         if full_url in self.pages:
             if has_permission(self.pages[full_url]):
-                return self.jsonify(self.pages[full_url].as_list(all_params=args))
+                return self.jsonify(self.pages[full_url].as_list(all_params=args, request=request))
             else: 
                 return ErrorResponse("No Permission", "Please login first or contact your administrator", "403").as_dict()
         elif base_url in self.pages and len(url_parts)>1:
             if has_permission(self.pages[base_url]):
-                return self.jsonify(self.pages[base_url].as_list(url_parts[1], all_params=args))
+                return self.jsonify(self.pages[base_url].as_list(url_parts[1], all_params=args, request=request))
             else:
                 return ErrorResponse("No Permission", "Please login first or contact your administrator", "403").as_dict()
         else:
@@ -343,7 +343,7 @@ class AdminApp:
         async def get_request_json_method(request):
             return await request.json()
         self.get_request_json = get_request_json_method
-        self.get_header = lambda name, request:request.headers[name] if name in request.headers else None
+        self.get_header = lambda name, request:request.headers[name] if request and name in request.headers else None
         self.get_url_args = lambda request: request.query_params._dict
         self.app = FastAPI()
 
